@@ -6,6 +6,22 @@ pygame.display.set_caption("Tetris - By Ryan Hajj")
 clock = pygame.time.Clock()
 frame = 0
 
+### Class for the blocks ###
+# files
+filenames = ["blocks/blue.png", "blocks/cyan.png", "blocks/green.png",
+"blocks/pink.png", "blocks/purple.png", "blocks/red.png", "blocks/yellow.png"]
+#class
+class block:
+    #init
+    def __init__(self,x,y,color):
+        self.x = x
+        self.y = y
+        self.color = color
+    #draws the block when run
+    def draw(self):
+        block = pygame.image.load(filenames[self.color])
+        window.blit(block,(self.x*32,self.y*32))
+
 bg = pygame.image.load("bg.png")
 bgRect = bg.get_rect()
 still = []
@@ -18,24 +34,6 @@ def displayText(text,size,where):
     wordsRect = words.get_rect()
     wordsRect.center = where
     window.blit(words, wordsRect)
-
-
-### Class for the blocks ###
-# files
-filenames = ["blocks/blue.png", "blocks/cyan.png", "blocks/green.png", "blocks/pink.png", "blocks/purple.png", "blocks/red.png", "blocks/yellow.png"]
-#class
-class block:
-    #init
-    def __init__(self,x,y,color):
-        self.x = (x * 32)
-        self.y = (y * 32)
-        self.color = color
-    #draws the block when run
-    def draw(self):
-        pass
-        block = pygame.image.load(filenames[self.color])
-        #blockRect = block.get_rect(self.x,self.y)
-        window.blit(block,(self.x,self.y))
 
 ### GAME LOOP ###
 while True:
@@ -50,22 +48,37 @@ while True:
             sys.exit()
     
     # Move Blocks in Falling
-    """
-    xyDict = {}
-    for block in still:
-        xyDict[block.y] = block.x
-        
-    for block in falling:
-        
-        if block.y + 1 in xyDict.keys:
-            if block.x in xyDict.items:
+    if frame == 30 or frame >= 60:
+        xyDict = {}
+        for block in still:
+            xyDict[block.y] = block.x
+
+        bol = True 
+        for block in falling:
             
-    """
+            for key in xyDict.keys():
+                if block.y -1 == key and block == xyDict[key]:
+                    bol = False
+            if block.y >= 20:
+                bol = False
+        if bol == True:
+            for block in falling:
+                block.y += 1
+        else:
+            for block in falling:
+                still.append(block)
+                falling.remove(block)
+        
+        if frame >= 60:
+            frame = 0
+
     ### SCREEN UPDATE ###
     window.fill((0,0,0))
     window.blit(bg,bgRect)
     for block in still:
-        block.draw()
+            block.draw()
+    for block in falling:
+            block.draw()
     displayText("FPS: "+str(int(clock.get_fps())),30,(464,56))
     clock.tick(60)
     pygame.display.flip()
