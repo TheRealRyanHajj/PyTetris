@@ -8,7 +8,8 @@ frame = 0
 
 bg = pygame.image.load("bg.png")
 bgRect = bg.get_rect()
-blocks = []
+still = []
+falling = []
 
 ### DRAW TEXT ###
 def displayText(text,size,where):
@@ -35,10 +36,12 @@ class block:
         block = pygame.image.load(filenames[self.color])
         #blockRect = block.get_rect(self.x,self.y)
         window.blit(block,(self.x,self.y))
-blocks.append(block(5,10,2))
+
 ### GAME LOOP ###
 while True:
+    # Add to frame
     frame += 1
+    
     ### EVENT LOOP ###
     for event in pygame.event.get():
         # Exit the program when the Red X is pressed
@@ -46,10 +49,22 @@ while True:
             pygame.quit()
             sys.exit()
     
+    # Move Blocks in Falling
+    """
+    xyDict = {}
+    for block in still:
+        xyDict[block.y] = block.x
+        
+    for block in falling:
+        
+        if block.y + 1 in xyDict.keys:
+            if block.x in xyDict.items:
+            
+    """
     ### SCREEN UPDATE ###
     window.fill((0,0,0))
     window.blit(bg,bgRect)
-    for block in blocks:
+    for block in still:
         block.draw()
     displayText("FPS: "+str(int(clock.get_fps())),30,(464,56))
     clock.tick(60)
