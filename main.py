@@ -4,6 +4,7 @@ pygame.init()
 window = pygame.display.set_mode((576,704))
 pygame.display.set_caption("Tetris - By Ryan Hajj")
 clock = pygame.time.Clock()
+frame = 0
 
 bg = pygame.image.load("bg.png")
 bgRect = bg.get_rect()
@@ -34,9 +35,10 @@ class block:
         block = pygame.image.load(filenames[self.color])
         #blockRect = block.get_rect(self.x,self.y)
         window.blit(block,(self.x,self.y))
-        
+blocks.append(block(5,10,2))
 ### GAME LOOP ###
 while True:
+    frame += 1
     ### EVENT LOOP ###
     for event in pygame.event.get():
         # Exit the program when the Red X is pressed
@@ -49,6 +51,6 @@ while True:
     window.blit(bg,bgRect)
     for block in blocks:
         block.draw()
-    displayText("FPS: "+str(int(clock.get_fps())),30,(384+32+32+16,32+16+8))
+    displayText("FPS: "+str(int(clock.get_fps())),30,(464,56))
     clock.tick(60)
     pygame.display.flip()
