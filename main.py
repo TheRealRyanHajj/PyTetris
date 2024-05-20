@@ -5,22 +5,24 @@ window = pygame.display.set_mode((576,704))
 pygame.display.set_caption("Tetris - By Ryan Hajj")
 clock = pygame.time.Clock()
 frame = 0
+dropFast = False
 
 ### Class for the blocks ###
 # files
 filenames = ["blocks/blue.png", "blocks/cyan.png", "blocks/green.png",
 "blocks/pink.png", "blocks/purple.png", "blocks/red.png", "blocks/yellow.png"]
 #class
-class block:
+class square:
     #init
-    def __init__(self,x,y,color):
+    def __init__(self,x,y,color,origin = False):
         self.x = x
         self.y = y
         self.color = color
+        self.origin = origin
     #draws the block when run
     def draw(self):
-        block = pygame.image.load(filenames[self.color])
-        window.blit(block,(self.x*32,self.y*32))
+        surface = pygame.image.load(filenames[self.color])
+        window.blit(surface,(self.x*32,self.y*32))
 
 bg = pygame.image.load("bg.png")
 bgRect = bg.get_rect()
@@ -46,39 +48,99 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    
+        #inputs
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                for each in falling:
+                    each.x += 1
+            if event.key == pygame.K_LEFT:
+                for each in falling:
+                    each.x -= 1
+            if event.key == pygame.K_DOWN:
+                dropFast = True
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                dropFast = False
+        
     # Move Blocks in Falling
-    if frame == 30 or frame >= 60:
+    if frame == 30 or frame >= 60 or dropFast:
         xyDict = {}
-        for block in still:
-            xyDict[block.y] = block.x
+        for each in still:
+            xyDict[each.y] = each.x
 
         bol = True 
-        for block in falling:
-            
-            for key in xyDict.keys():
-                if block.y -1 == key and block == xyDict[key]:
+        for each in falling:
+            for each2 in still:
+                if each.y + 1 == each2.y and each.x == each2.x:
                     bol = False
-            if block.y >= 20:
+            if each.y >= 20:
                 bol = False
         if bol == True:
-            for block in falling:
-                block.y += 1
+            for each in falling:
+                each.y += 1
         else:
-            for block in falling:
-                still.append(block)
-                falling.remove(block)
+            for each in falling:
+                still.append(each)
+            falling = []
         
         if frame >= 60:
             frame = 0
 
+    if frame == 15 or frame == 45:
+        if falling == []:
+            num = random.randint(1,7)
+            col = random.randint(0,6)
+            # O block
+            if num == 1:
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(6,2,col))
+                falling.append(square(6,3,col))
+            # I block
+            if num == 2:
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(5,4,col))
+                falling.append(square(5,5,col))
+            # S block
+            if num == 3:
+                falling.append(square(4,2,col))
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(6,3,col))
+            # Z block
+            if num == 4:
+                falling.append(square(6,2,col))
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(4,3,col))
+            # T block
+            if num == 5:
+                falling.append(square(5,2,col))
+                falling.append(square(4,3,col))
+                falling.append(square(5,3,col))
+                falling.append(square(6,3,col))
+            # L block
+            if num == 6:
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(5,4,col))
+                falling.append(square(6,4,col))
+            # J block
+            if num == 7:
+                falling.append(square(5,2,col))
+                falling.append(square(5,3,col))
+                falling.append(square(5,4,col))
+                falling.append(square(4,4,col))
+
+
     ### SCREEN UPDATE ###
     window.fill((0,0,0))
     window.blit(bg,bgRect)
-    for block in still:
-            block.draw()
-    for block in falling:
-            block.draw()
+    for each in still:
+            each.draw()
+    for each in falling:
+            each.draw()
     displayText("FPS: "+str(int(clock.get_fps())),30,(464,56))
     clock.tick(60)
     pygame.display.flip()
