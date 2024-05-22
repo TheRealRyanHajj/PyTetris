@@ -37,6 +37,33 @@ def displayText(text,size,where):
     wordsRect.center = where
     window.blit(words, wordsRect)
 
+# get origin
+def getOrigin():
+    for each in falling:
+        if each.origin == True:
+            return each.x,each.y
+        
+# move all peices in falling by x y
+def moveAll(point,positive=True):
+    x,y = point
+    if not positive:
+        x,y = (-1 * x),(-1 * y)
+    for each in falling:
+        each.x += x
+        each.y += y
+
+# rotate all in falling around 0,0
+def rotateAll(right=True):
+    if right:    
+        for each in falling:
+            x,y = each.x,each.y
+            each.x = y*-1
+            each.y = x
+    else:
+        for each in falling:
+            x,y = each.x,each.y
+            each.x = y
+            each.y = x*-1
 ### GAME LOOP ###
 while True:
     # Add to frame
@@ -58,6 +85,16 @@ while True:
                     each.x -= 1
             if event.key == pygame.K_DOWN:
                 dropFast = True
+            if (event.key == pygame.K_x or event.key == pygame.K_z) and num != 1:
+                ### Rotate peices in falling around block with origin ###
+                Origin = getOrigin() # stores as x,y (so a list)
+                moveAll(Origin,False)
+                if event.key == pygame.K_x:
+                    rotateAll()
+                elif event.key == pygame.K_z:
+                    rotateAll(False)
+                moveAll(Origin)
+                
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 dropFast = False
@@ -86,53 +123,66 @@ while True:
         if frame >= 60:
             frame = 0
 
+    # make new blocks
     if frame == 15 or frame == 45:
         if falling == []:
             num = random.randint(1,7)
             col = random.randint(0,6)
             # O block
             if num == 1:
-                falling.append(square(5,2,col))
+                falling.append(square(5,2,col,True))
                 falling.append(square(5,3,col))
                 falling.append(square(6,2,col))
                 falling.append(square(6,3,col))
             # I block
             if num == 2:
                 falling.append(square(5,2,col))
-                falling.append(square(5,3,col))
+                falling.append(square(5,3,col,True))
                 falling.append(square(5,4,col))
                 falling.append(square(5,5,col))
             # S block
             if num == 3:
                 falling.append(square(4,2,col))
-                falling.append(square(5,2,col))
+                falling.append(square(5,2,col,True))
                 falling.append(square(5,3,col))
                 falling.append(square(6,3,col))
             # Z block
             if num == 4:
                 falling.append(square(6,2,col))
                 falling.append(square(5,2,col))
-                falling.append(square(5,3,col))
+                falling.append(square(5,3,col,True))
                 falling.append(square(4,3,col))
             # T block
             if num == 5:
                 falling.append(square(5,2,col))
                 falling.append(square(4,3,col))
-                falling.append(square(5,3,col))
+                falling.append(square(5,3,col,True))
                 falling.append(square(6,3,col))
             # L block
             if num == 6:
                 falling.append(square(5,2,col))
                 falling.append(square(5,3,col))
-                falling.append(square(5,4,col))
+                falling.append(square(5,4,col,True))
                 falling.append(square(6,4,col))
             # J block
             if num == 7:
                 falling.append(square(5,2,col))
                 falling.append(square(5,3,col))
-                falling.append(square(5,4,col))
+                falling.append(square(5,4,col,True))
                 falling.append(square(4,4,col))
 
+        # line check
+        for i in range(20,1,-1):
+            num = 0
+            for each in still:
+                if each.y == i:
+                    num += 1
+                if num == 10:
+                    for each2 in still:
+                        if each2.y == i:
+                            still.remove(each2)
+                        if each2.y < i:
+                            each2.y += 1
 
     ### SCREEN UPDATE ###
     window.fill((0,0,0))
