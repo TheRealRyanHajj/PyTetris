@@ -64,6 +64,16 @@ def rotateAll(right=True):
             x,y = each.x,each.y
             each.x = y
             each.y = x*-1
+
+# collision checker
+def checkCollision():
+    for each in falling:
+        for each2 in still:
+            if each.x == each2.x and each.y == each2.y:
+                return True
+            if each.x > 10 or each.x < 1:
+                return True
+
 ### GAME LOOP ###
 while True:
     # Add to frame
@@ -80,9 +90,15 @@ while True:
             if event.key == pygame.K_RIGHT:
                 for each in falling:
                     each.x += 1
+                if checkCollision():
+                    for each in falling:
+                        each.x -= 1
             if event.key == pygame.K_LEFT:
                 for each in falling:
                     each.x -= 1
+                if checkCollision():
+                    for each in falling:
+                        each.x += 1
             if event.key == pygame.K_DOWN:
                 dropFast = True
             if (event.key == pygame.K_x or event.key == pygame.K_z) and num != 1:
@@ -94,6 +110,15 @@ while True:
                 elif event.key == pygame.K_z:
                     rotateAll(False)
                 moveAll(Origin)
+                if checkCollision():
+                    Origin = getOrigin() # stores as x,y (so a list)
+                    moveAll(Origin,False)
+                    if event.key == pygame.K_z:
+                        rotateAll()
+                    elif event.key == pygame.K_x:
+                        rotateAll(False)
+                    moveAll(Origin)
+
                 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
@@ -126,7 +151,7 @@ while True:
     # make new blocks
     if frame == 15 or frame == 45:
         if falling == []:
-            num = random.randint(1,7)
+            num = random.randint(1,9)
             col = random.randint(0,6)
             # O block
             if num == 1:
@@ -135,7 +160,7 @@ while True:
                 falling.append(square(6,2,col))
                 falling.append(square(6,3,col))
             # I block
-            if num == 2:
+            if num == 2 or num == 8 or num == 9:
                 falling.append(square(5,2,col))
                 falling.append(square(5,3,col,True))
                 falling.append(square(5,4,col))
@@ -178,11 +203,14 @@ while True:
                 if each.y == i:
                     num += 1
                 if num == 10:
+                    stillRemove = []
                     for each2 in still:
                         if each2.y == i:
-                            still.remove(each2)
+                            stillRemove.append(each2)
                         if each2.y < i:
                             each2.y += 1
+                    for each in stillRemove:
+                        still.remove(each)
 
     ### SCREEN UPDATE ###
     window.fill((0,0,0))
